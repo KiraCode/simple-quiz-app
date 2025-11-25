@@ -1,11 +1,9 @@
-import React from 'react'
+import React, { useState } from "react";
+import WelcomeScreen from "./components/WelcomeScreen";
 
 const App = () => {
-  return (
-    <div>
-      
-    </div>
-  )
-}
+  const [viewScreen, setViewScreen] = useState("welcome");
+  return <div>{viewScreen === "welcome" && <WelcomeScreen />}</div>;
+};
 
-export default App
+export default App;

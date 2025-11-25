@@ -1,6 +1,9 @@
 import React from "react";
 import QuestionBubble from '../assets/question-bubble.png'
 import GreenCheckMark from '../assets/check-circle-green.svg'
+import QuizLogo from "./ui/QuizLogo";
+import Card from "./ui/Card";
+import Button from "./ui/Button";
 
 
 const WelcomeScreen = () => {

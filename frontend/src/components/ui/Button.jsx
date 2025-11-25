@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import React, { useMemo } from "react";
 
 const Button = ({
@@ -12,9 +13,18 @@ const Button = ({
 }) => {
   const buttonClass = useMemo(
     () => clsx("btn", size, { loading }),
-    [aize, loading, disabled]
+    [size, loading, disabled]
   );
-  return <div></div>;
+  return (
+    <button
+      className={buttonClass}
+      onClick={onClick}
+      disabled={disabled || loading}
+    >
+      {loading ? loadingText : children}
+      {!loading && icon && iconPosition === "right" && icon}
+    </button>
+  );
 };
 
 export default Button;
