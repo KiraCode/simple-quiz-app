@@ -4,7 +4,7 @@ import React, { useMemo } from "react";
 const Button = ({
   size,
   loading,
-  loadingText = "Loading.....",
+  loadingText = "Loading...",
   children,
   onClick,
   disabled,

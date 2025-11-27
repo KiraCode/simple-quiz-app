@@ -1,36 +1,77 @@
-import React from "react";
-import QuizLogo from "./ui/QuizLogo";
-import Card from "./ui/Card";
-import Button from "./ui/Button";
-import Trophy from "../assets/trophy.png";
+import React, { useCallback, useState } from 'react'
+import QuizLogo from "../components/ui/QuizLogo.jsx";
+import Card from "../components/ui/Card.jsx";
+import Button from "../components/ui/Button.jsx";
+import Tropy from "../assets/trophy.png";
 import RestartIcon from "../assets/restart-icon.svg";
+import useQuestionContext from '../hooks/useQuestionContext.js';
+import { useMemo } from 'react';
+import fetchQuestionAPI from '../api/fetchQuestionAPI.js';
+import handleError from "../utils/handleError";
+function RestartIconFC(){
+    return <img src={RestartIcon} alt="restart icon" />
+} 
+const ResultScreen = ({showQuestionScreen}) => {
+  const [loading,setLoading]=useState(false);
+  const { totalQuestions, correctAnswers, processQuestions } =
+    useQuestionContext();
+  //show result based on score
 
-function RestartIconFc() {
-  return <img src={RestartIcon} alt="restart icon" />;
-}
+  const feedbackText = useMemo(function(){
+    const percentage = (correctAnswers/totalQuestions)*100;
+    if (percentage >= 90) {
+      return "EXCELLENT JOB";
+    } else if (percentage >= 70) {
+      return "GOOD JOB";
+    } else if (percentage >= 50) {
+      return "YOU DID OK";
+    } else  {
+      return "YOU COULD DO BETTER";
+    }
+  },[correctAnswers,totalQuestions]);
 
-const ResultScreen = () => {
+
+  const handleResponse = useCallback(
+    function (responseData) {
+      console.log(responseData);
+      processQuestions(responseData.questions);
+      //changeScreen
+      showQuestionScreen();
+    },
+    [processQuestions, showQuestionScreen]
+  );
+
+  const beginQuiz = useCallback(
+    function () {
+      fetchQuestionAPI(handleResponse, handleError, setLoading);
+    },
+    [handleResponse]
+  );
+
   return (
     <section className="result-section">
       <QuizLogo size="large" />
       <Card className="result-card">
         <div className="result-icon-wrapper">
-          <img src={Trophy} alt="" />
+          <img src={Tropy} alt="thropy" />
         </div>
-        <h1 className="result-text">GOOD JOB</h1>
+        <h1 className="result-text">{feedbackText}</h1>
         <div className="result-details">
-          <span className="correct-answers">17</span>
+          <span className="correct-answers">{correctAnswers}</span>
           <p className="total-questions">
-            Questions <br />
-            out of <span className="weight-700">30</span>
+            Questions
+            <br />
+            out of <span className="weight-700">{totalQuestions}</span>
           </p>
         </div>
-        <Button size={'small'} icon={<RestartIconFc />} iconPosition="right">
-          Restart
+
+        <Button size="small" icon={<RestartIconFC />} iconPosition="right"  onClick={beginQuiz}
+        loading={loading} >
+           Restart 
         </Button>
       </Card>
     </section>
   );
-};
+}
 
-export default ResultScreen;
+export default ResultScreen
