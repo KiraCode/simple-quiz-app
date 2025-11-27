@@ -1,13 +1,24 @@
-import clsx from "clsx";
-import React from "react";
+import clsx from 'clsx';
+import React, { useMemo } from 'react'
+import useQuestionContext from '../../hooks/useQuestionContext';
 
 const ProgressBar = () => {
-  const progressText = () => "20%";
+   
+
+    const {activeQuestionNumber,totalQuestions}= useQuestionContext();
+
+   const progressText =useMemo( () => `${((activeQuestionNumber/totalQuestions)*100).toFixed(2)}%`,[activeQuestionNumber,totalQuestions]);
+
+   const isFinalQuestion = useMemo(()=> activeQuestionNumber === totalQuestions,[activeQuestionNumber,totalQuestions])
   return (
-    <progress value={20} max={100} className={clsx("progress-bar")}>
+    <progress
+      value={activeQuestionNumber}
+      max={totalQuestions}
+      className={clsx("progress-bar", isFinalQuestion && "progress-bar-final")}
+    >
       {progressText}
     </progress>
   );
-};
+}
 
-export default ProgressBar;
+export default ProgressBar

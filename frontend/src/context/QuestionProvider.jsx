@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import QuestionContext from "../context/QuestionContext.js";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import QuestionContext from "../context/QuestionContext";
 
-const QuestionProvider = ({ children }) => {
-  // api calling, functions, properties
+export default function QuestionProvider({children}){
+  //Api Calling ,functions,Properties
+
   const [questions, setQuestions] = useState([]);
   const [activeQuestionId, setActiveQuestionId] = useState("");
 
@@ -18,7 +19,7 @@ const QuestionProvider = ({ children }) => {
   });
 
   const activeQuestion = useMemo(
-    () => questions.find((question) => question._id === activeQuestionId) + 1,
+    () => questions.find((question) => question._id === activeQuestionId),
     [activeQuestionId, questions]
   );
 
@@ -28,10 +29,10 @@ const QuestionProvider = ({ children }) => {
     [activeQuestionId, questions]
   );
 
-  const totalNoOfQuestion = useMemo(() => questions.length, [questions]);
+  const totalQuestions = useMemo(() => questions.length, [questions]);
 
-  const updateQuestioStatus = useCallback(
-    (iisAnswerCorrect) => {
+  const updateQuestionStatus = useCallback(
+    (isAnswerCorrect) => {
       setQuestions((prevQuestions) =>
         prevQuestions.map((question) =>
           question._id === activeQuestionId
@@ -41,21 +42,68 @@ const QuestionProvider = ({ children }) => {
       );
     },
     [activeQuestionId]
-  );
+  ); //hasAttempted=true,isAnswerCorrect = true
 
   useEffect(() => {
-    // this code will run AFTER the component re-renders due to 'questions' changing
+    //this code will run after the component re render due to questions changing
     console.log("Question state have been updated", questions);
-    // check the console here to see if hasAttempted is true for the correct option
   }, [questions]);
 
-//   activeNextQuestion
-// 1 -> 2
-//  10 -> last question
+  //Function to update active questionId
+  // whenever we click on next button the activequestionid  should increase by 1 and if  totalquestions=activequestionid it is the last question
+
+  const activeNextQuestion = useCallback(() => {
+    const currentIndex = questions.findIndex(
+      (question) => question._id === activeQuestionId
+    );
+
+    if (currentIndex !== -1 && currentIndex + 1 < questions.length) {
+      setActiveQuestionId(questions[currentIndex + 1]._id);
+    }
+  }, [activeQuestionId, questions]);
+
+//   const activeNextQuestion = useCallback(() => {
+//     const currentIndex = questions.findIndex(
+//       (question) => question._id === activeQuestionId
+//     );
+
+//     if (currentIndex !== -1 && currentIndex + 1 < questions.length) {
+//       setActiveQuestionId(questions[currentIndex + 1]._id);
+//     }
+//   }, [activeQuestionId, questions]);
+
+
+  //Function to find out no. of correct answers
+  const correctAnswers = useMemo(() => {
+    const noOfCorrectAnswers = questions.filter(
+      (question) => question.isAnswerCorrect
+    ).length;
+
+    return noOfCorrectAnswers;
+  }, [questions]);
+
+  const contextValue = useMemo(
+    () => ({
+      activeQuestion,
+      activeQuestionNumber,
+      totalQuestions,
+      correctAnswers,
+      processQuestions,
+      updateQuestionStatus,
+      activeNextQuestion,
+    }),
+    [
+      activeQuestion,
+      activeQuestionNumber,
+      totalQuestions,
+      correctAnswers,
+      processQuestions,
+      updateQuestionStatus,
+      activeNextQuestion,
+    ]
+  );
 
   return (
-    <QuestionContext.Provider value={{}}>{children}</QuestionContext.Provider>
+    <QuestionContext.Provider value={contextValue}>{children}</QuestionContext.Provider>
   );
-};
-
-export default QuestionProvider;
+}
