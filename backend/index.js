@@ -18,7 +18,7 @@ db();
 app.use("/api/v1/questions", questionRouter)
 
 // Server Start
-const port = process.env.port || 4001;
+const port = process.env.PORT || 4001;
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
